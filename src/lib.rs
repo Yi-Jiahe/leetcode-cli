@@ -1,6 +1,7 @@
 pub mod endpoints {
     const LEETCODE_API_ENDPOINT: &str = "https://leetcode.com/graphql";
-    const DAILY_CODING_CHALLENGE_QUERY: &str = "
+
+    const QUESTION_OF_TODAY_QUERY: &str = "
     query questionOfToday {
         activeDailyCodingChallengeQuestion {
             date
@@ -34,14 +35,18 @@ pub mod endpoints {
         headers.insert("referer", "https://leetcode.com/problemset/all/".parse().unwrap());
         headers.insert("cookie", cookie.parse().unwrap());
         headers.insert("x-csrftoken", format!("{}", csrftoken).parse().unwrap());
+        headers.insert("content-type", "application/json".parse().unwrap());
 
+        let mut map = std::collections::HashMap::new();
+        map.insert("query", QUESTION_OF_TODAY_QUERY);
+        map.insert("variables", "{}");
 
         let client = reqwest::blocking::Client::builder()
             .default_headers(headers)
             .build()?;
-
+        
         let resp = client.post(LEETCODE_API_ENDPOINT)
-        .body(DAILY_CODING_CHALLENGE_QUERY)
+        .json(&map)
         .send()?;
 
         println!("{}", resp.text()?);
