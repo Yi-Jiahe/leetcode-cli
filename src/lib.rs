@@ -1,4 +1,8 @@
+extern crate serde_json;
+
 pub mod endpoints {
+    use serde_json::Value;
+
     const LEETCODE_API_ENDPOINT: &str = "https://leetcode.com/graphql";
 
     const QUESTION_OF_TODAY_QUERY: &str = "
@@ -49,7 +53,15 @@ pub mod endpoints {
         .json(&map)
         .send()?;
 
-        println!("{}", resp.text()?);
+        let v: Value = match serde_json::from_str(&resp.text()?) {
+            Ok(value) => value,
+            Err(error) => panic!("Unable to parse response to json \n {}", error),
+        };
+
+        dbg!(&v);
+
+        let link = &v["data"]["activeDailyCodingChallengeQuestion"]["link"];
+        println!("Link: {}", link);
 
         Ok(())
     }
