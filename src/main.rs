@@ -1,7 +1,16 @@
+extern crate dotenv;
+
+use dotenv::dotenv;
+use std::env;
+
 use leetcode_cli::endpoints;
 
-fn main() {
-    println!("Hello, world!");
+fn main() -> Result<(), std::env::VarError> {    
+    dotenv().ok();
 
-    endpoints::get_daily();
+    let csrftoken = env::var("CSRFTOKEN")?;
+
+    endpoints::get_daily(&csrftoken);
+
+    Ok(())
 }
